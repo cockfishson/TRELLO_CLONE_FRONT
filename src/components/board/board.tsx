@@ -1,12 +1,16 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchLists, createList, updateLists } from "../../redux/slices/listsSlice";
+import {
+  fetchLists,
+  createList,
+  updateLists,
+} from "../../redux/slices/listsSlice";
 import List from "../list/list";
 import Modal from "../modalWindow/modalWindow";
 import normalizeCardPositions from "../../helpers/normalizeLists";
+import { updateCard } from "../../redux/slices/cardsSlice.ts";
 import * as styles from "./board.css";
 import { AppDispatch } from "../../redux/store";
-import { updateCard } from "../../redux/slices/cardsSlice";
 
 interface BoardProps {
   boardId: number;
@@ -18,6 +22,7 @@ const Board: React.FC<BoardProps> = ({ boardId }) => {
   const sortedLists = [...lists].sort(
     (a: any, b: any) => a.position - b.position,
   );
+  console.log("oops");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState<string>("");
   const fetchListsHandler = useCallback(async (): Promise<void> => {
@@ -33,7 +38,6 @@ const Board: React.FC<BoardProps> = ({ boardId }) => {
       console.error("Error fetching and normalizing lists:", error);
     }
   }, [dispatch, boardId]);
-  
 
   useEffect(() => {
     fetchListsHandler();
@@ -43,19 +47,25 @@ const Board: React.FC<BoardProps> = ({ boardId }) => {
     dragIndex: number,
     hoverIndex: number,
     dragListId: number,
-    hoverListId: number
+    hoverListId: number,
   ) => {
     const currentLists = [...lists].map((list) => ({
       ...list,
       TrelloCards: [...list.TrelloCards],
     }));
-  
+    console.log("it's happening");
+    console.log(dragIndex);
+    console.log(hoverIndex);
+    console.log(dragListId);
+    console.log(hoverListId);
     const sourceList = currentLists.find((list) => list.list_id === dragListId);
-    const targetList = currentLists.find((list) => list.list_id === hoverListId);
-  
+    const targetList = currentLists.find(
+      (list) => list.list_id === hoverListId,
+    );
+
     if (!sourceList || !targetList) return;
     if (dragIndex < 0 || dragIndex >= sourceList.TrelloCards.length) return;
-  
+
     const draggedCard = sourceList.TrelloCards[dragIndex];
     if (!draggedCard) return;
     try {
@@ -63,14 +73,13 @@ const Board: React.FC<BoardProps> = ({ boardId }) => {
         updateCard({
           cardId: draggedCard.card_id,
           data: { list_id: hoverListId, position: hoverIndex },
-        })
+        }),
       );
       fetchListsHandler();
     } catch (error) {
       console.error("Error updating card position:", error);
     }
   };
-  
 
   const handleAddList = () => {
     setModalTitle("Create New List");
@@ -79,13 +88,8 @@ const Board: React.FC<BoardProps> = ({ boardId }) => {
 
   const handleCreateList = (title: string) => {
     dispatch(createList({ boardId, title, position: lists.length + 1 }))
-      .then(() => {
-        setIsModalOpen(false);
-        fetchListsHandler();
-      })
-      .catch((error) => {
-        console.error("Failed to create list:", error);
-      });
+      .then(() => fetchListsHandler())
+      .finally(() => setIsModalOpen(false));
   };
 
   return (

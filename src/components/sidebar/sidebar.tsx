@@ -10,36 +10,24 @@ import {
 import { RootState, AppDispatch } from "../../redux/store";
 import * as style from "./sidebar.css";
 import Modal from "../modalWindow/modalWindow";
-import {
-  fetchActivityLog,
-  createActivityLog,
-} from "../../redux/slices/activityLogSlice";
+import { createActivityLog } from "../../redux/slices/activityLogSlice.ts";
 
 const Sidebar: React.FC<{ onBoardSelect: (boardId: number) => void }> = ({
   onBoardSelect,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const selectedId = useSelector(
-    (state: RootState) => state.boards.activeBoardId,
-  );
   const [modalTitle, setModalTitle] = useState("");
   const [modalContent, setModalContent] = useState<React.ReactNode>(null);
-  const [selectedBoardId, setSelectedBoardId] = useState<number | null>(null);
-  const dispatch = useDispatch<AppDispatch>();
+  const selectedBoardId = useSelector(
+    (state: RootState) => state.boards.activeBoardId,
+  );
   const { boards, loading, error } = useSelector(
     (state: RootState) => state.boards,
   );
-  const { logs, loading: logsLoading } = useSelector(
-    (state: RootState) => state.activityLog,
-  );
-
-  const handleBoardChange = () => {
-    setSelectedBoardId(selectedId);
-  };
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     dispatch(fetchBoards());
-    dispatch(fetchActivityLog());
   }, [dispatch]);
 
   if (loading) return <div className={style.sidebarStyle}>Loading...</div>;
@@ -47,7 +35,6 @@ const Sidebar: React.FC<{ onBoardSelect: (boardId: number) => void }> = ({
 
   const handleBoardClick = (boardId: number) => {
     dispatch(changeActiveBoard(boardId));
-    handleBoardChange();
     onBoardSelect(boardId);
   };
 
@@ -60,20 +47,20 @@ const Sidebar: React.FC<{ onBoardSelect: (boardId: number) => void }> = ({
           const formData = new FormData(e.target as HTMLFormElement);
           const title = formData.get("title") as string;
           dispatch(createBoard(title))
-            .then((action) => {
-              if (action.meta.requestStatus === "fulfilled") {
-                dispatch(fetchBoards());
-                dispatch(
-                  createActivityLog({
-                    action_type: "create",
-                    action_details: `Created board with title "${title}".`,
-                  }),
-                );
-              }
-              setIsModalOpen(false);
+            .then(() => {
+              dispatch(
+                createActivityLog({
+                  action_type: "create",
+                  action_details: `Created board "${title}".`,
+                }),
+              );
+              return dispatch(fetchBoards());
             })
             .catch((error) => {
               console.error("Failed to create board:", error);
+            })
+            .finally(() => {
+              setIsModalOpen(false);
             });
         }}
       >
@@ -96,20 +83,20 @@ const Sidebar: React.FC<{ onBoardSelect: (boardId: number) => void }> = ({
           const formData = new FormData(e.target as HTMLFormElement);
           const newTitle = formData.get("title") as string;
           dispatch(updateBoard({ boardId, newTitle }))
-            .then((action) => {
-              if (action.meta.requestStatus === "fulfilled") {
-                dispatch(fetchBoards());
-                dispatch(
-                  createActivityLog({
-                    action_type: "update",
-                    action_details: `Updated board ID ${boardId} to title "${newTitle}".`,
-                  }),
-                );
-              }
-              setIsModalOpen(false);
+            .then(() => {
+              dispatch(
+                createActivityLog({
+                  action_type: "update",
+                  action_details: `Changed board title from "${currentTitle}" to "${newTitle}".`,
+                }),
+              );
+              return dispatch(fetchBoards());
             })
             .catch((error) => {
               console.error("Failed to update board:", error);
+            })
+            .finally(() => {
+              setIsModalOpen(false);
             });
         }}
       >
@@ -129,27 +116,30 @@ const Sidebar: React.FC<{ onBoardSelect: (boardId: number) => void }> = ({
   };
 
   const openDeleteBoardModal = (boardId: number) => {
+    const board = boards.find((b) => b.board_id === boardId);
+    if (!board) return;
+
     setModalTitle("Confirm Delete");
     setModalContent(
       <div>
-        <p>Are you sure you want to delete this board?</p>
+        <p>Are you sure you want to delete the board "{board.title}"?</p>
         <button
           onClick={() => {
             dispatch(deleteBoard(boardId))
-              .then((action) => {
-                if (action.meta.requestStatus === "fulfilled") {
-                  dispatch(fetchBoards());
-                  dispatch(
-                    createActivityLog({
-                      action_type: "delete",
-                      action_details: `Deleted board with ID ${boardId}.`,
-                    }),
-                  );
-                }
-                setIsModalOpen(false);
+              .then(() => {
+                dispatch(
+                  createActivityLog({
+                    action_type: "delete",
+                    action_details: `Deleted board "${board.title}".`,
+                  }),
+                );
+                return dispatch(fetchBoards());
               })
               .catch((error) => {
                 console.error("Failed to delete board:", error);
+              })
+              .finally(() => {
+                setIsModalOpen(false);
               });
           }}
         >
@@ -164,7 +154,7 @@ const Sidebar: React.FC<{ onBoardSelect: (boardId: number) => void }> = ({
   return (
     <div className={style.sidebarStyle}>
       <div className={style.headerRow}>
-        <h2 className={style.sidebarHeader}>Your boards</h2>
+        <h2 className={style.sidebarHeader}>Your Boards</h2>
         <button className={style.addBoardButton} onClick={openCreateBoardModal}>
           +
         </button>
@@ -202,22 +192,6 @@ const Sidebar: React.FC<{ onBoardSelect: (boardId: number) => void }> = ({
           </li>
         ))}
       </ul>
-      <h2 className={style.sidebarHeader}>Activity Log</h2>
-      <div className={style.activityLog}>
-        {logsLoading ? (
-          <p>Loading logs...</p>
-        ) : (
-          <ul className={style.activityLogList}>
-            {logs.map((log) => (
-              <li key={log.activity_id} className={style.activityLogItem}>
-                <p>{log.user_name_and_surname}</p>
-                <p>{log.action_details}</p>
-                <small>{new Date(log.created_at).toLocaleString()}</small>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

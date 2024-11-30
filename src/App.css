@@ -1,8 +1,6 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
   text-align: center;
+  overflow: hidden;
 }
 
 .logo {
@@ -36,10 +34,28 @@
   }
 }
 
-.card {
-  padding: 2em;
-}
-
 .read-the-docs {
   color: #888;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  height: 100vh;
+}
+
+.app-main {
+  display: flex;
+  flex: 1;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  margin-top: 50px;
+}
+
+.board-container {
+  flex: 1;
+  overflow-x: hidden;
+  overflow-y: hidden;
 }

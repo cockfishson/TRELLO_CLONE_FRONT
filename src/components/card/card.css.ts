@@ -4,15 +4,22 @@ export const card = style({
   backgroundColor: "rgba(75,75,75,0.8)",
   border: "1px solid #656166",
   borderRadius: "8px",
-  padding: "12px",
+  minHeight:"40px",
+  width:"90%",
+  padding:"0% 4% 0% 4%",
+  height:"fit-content",
   marginBottom: "12px",
   cursor: "pointer",
   color: "#d3d3d3",
   transition: "transform 0.2s, box-shadow 0.2s",
+  alignItems:"center",
   ":hover": {
     transform: "translateY(-2px)",
     boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.3)",
   },
+  justifyContent:"space-between", 
+  display:"flex",
+
 });
 
 export const dragging = style({
@@ -20,14 +27,20 @@ export const dragging = style({
 });
 
 export const cardTitle = style({
-  fontSize: "16px",
+  fontSize: "14px",
   fontWeight: "600",
-  margin: "0 0 8px",
   overflow: "hidden",
   whiteSpace: "nowrap",
   textOverflow: "ellipsis",
-  color: "#e4e4e4",
+  color: "#9fadbc",
+  margin:"0",
+  height:"20px",
 });
+
+export const descriptionIcon = style({
+  width:"20px",
+  height: "20px",
+})
 
 export const modalContent = style({
   display: "flex",
@@ -36,7 +49,7 @@ export const modalContent = style({
 });
 
 export const input = style({
-  width: "100%",
+  width: "95%",
   padding: "8px",
   borderRadius: "4px",
   border: "1px solid #9fadbc",
@@ -50,7 +63,7 @@ export const input = style({
 });
 
 export const textarea = style({
-  width: "100%",
+  width: "95%",
   padding: "8px",
   borderRadius: "4px",
   border: "1px solid #9fadbc",

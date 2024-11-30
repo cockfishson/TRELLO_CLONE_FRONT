@@ -36,7 +36,7 @@ export const boardButtonStyle = style({
   color: "white",
   cursor: "pointer",
   ":hover": {
-    color: "656166",
+    color: "#656166",
   },
   width: "20px",
   height: "30px",
@@ -84,33 +84,4 @@ export const addBoardButton = style({
 
 export const activeBoard = style({
   backgroundColor: "#656166",
-});
-
-export const activityLog = style({
-  marginTop: "20px",
-  padding: "0 15px",
-  height: "500px",
-  overflowY: "auto",
-  backgroundColor: "#2e2a2e",
-  borderRadius: "4px",
-});
-
-export const activityLogList = style({
-  listStyle: "none",
-  margin: "0",
-  padding: "0",
-});
-
-export const activityLogItem = style({
-  padding: "10px",
-  borderBottom: "1px solid #444",
-  color: "#ccc",
-  ":last-child": {
-    borderBottom: "none",
-  },
-});
-
-export const activityLogDate = style({
-  fontSize: "12px",
-  color: "#888",
 });

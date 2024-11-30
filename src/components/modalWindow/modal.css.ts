@@ -19,7 +19,7 @@ export const modalOverlayStyle = style({
 });
 
 export const modalContainerStyle = style({
-  backgroundColor: "#fff",
+  backgroundColor: "rgba(10,10,10,0.8)",
   borderRadius: "8px",
   boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
   width: "400px",
@@ -36,7 +36,7 @@ export const modalHeaderStyle = style({
   borderBottom: "1px solid #ddd",
   paddingBottom: "10px",
   marginBottom: "20px",
-  color: "#333",
+  color: "#9fadbc",
 });
 
 export const modalContentStyle = style({

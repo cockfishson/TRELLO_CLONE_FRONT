@@ -18,7 +18,7 @@ export const updateLists = createAsyncThunk(
   async ({ boardId, lists }: { boardId: number; lists: List[] }) => {
     await apiService.updateBoardLists(boardId, lists);
     return lists;
-  }
+  },
 );
 
 export const fetchLists = createAsyncThunk(
@@ -26,7 +26,7 @@ export const fetchLists = createAsyncThunk(
   async (boardId: number) => {
     const lists = await apiService.getBoardContent(boardId);
     return lists;
-  }
+  },
 );
 
 export const createList = createAsyncThunk(
@@ -42,7 +42,7 @@ export const createList = createAsyncThunk(
   }) => {
     const list = await apiService.createList(boardId, title, position);
     return list;
-  }
+  },
 );
 
 export const updateList = createAsyncThunk(
@@ -56,7 +56,7 @@ export const updateList = createAsyncThunk(
   }) => {
     const updatedList = await apiService.updateList(listId, data);
     return updatedList;
-  }
+  },
 );
 
 export const deleteList = createAsyncThunk(
@@ -64,7 +64,7 @@ export const deleteList = createAsyncThunk(
   async (listId: number) => {
     await apiService.deleteList(listId);
     return listId;
-  }
+  },
 );
 
 const listsSlice = createSlice({
@@ -98,11 +98,12 @@ const listsSlice = createSlice({
         state.error = action.error.message || "Failed to update lists.";
       })
       .addCase(createList.fulfilled, (state, action) => {
-        state.lists.push(action.payload);
+        const newList = { ...action.payload, TrelloCards: [] };
+        state.lists.push(newList);
       })
       .addCase(updateList.fulfilled, (state, action) => {
         const index = state.lists.findIndex(
-          (list) => list.list_id === action.payload.list_id
+          (list) => list.list_id === action.payload.list_id,
         );
         if (index !== -1) {
           state.lists[index] = action.payload;
@@ -110,7 +111,7 @@ const listsSlice = createSlice({
       })
       .addCase(deleteList.fulfilled, (state, action) => {
         state.lists = state.lists.filter(
-          (list) => list.list_id !== action.payload
+          (list) => list.list_id !== action.payload,
         );
       });
   },

@@ -1,27 +1,35 @@
 import { style } from "@vanilla-extract/css";
 
 export const list = style({
-  width: "300px",
+  width: "270px",
+  minWidth: "270px",
   backgroundColor: "rgba(10,10,10,0.8)",
   borderRadius: "8px",
   boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-  padding: "16px",
+  padding: "10px 16px 10px 16px",
+  display: "flex",
+  flexDirection: "column",
+  overflowY: "hidden", 
+  height:"fit-content",
+  maxHeight: "calc(100vh - 160px)",
 });
 
-export const cards = style({
-  marginTop: "16px",
+export const cardContainer = style({
+  overflowY: "auto", 
+  height:"fit-content",
+  paddingTop:"5px",
 });
 
 export const addCardButton = style({
   padding: "8px 16px",
   backgroundColor: "rgba(70,70,70,0.8)",
-  color: "#fff",
+  color: "#9fadbc",
   border: "none",
   borderRadius: "4px",
   cursor: "pointer",
   width: "100%",
   ":hover": {
-    backgroundColor: "#218838",
+    backgroundColor: "#656166",
   },
 });
 
@@ -63,10 +71,10 @@ export const boardButtonStyle = style({
   background: "transparent",
   border: "none",
   fontSize: "20px",
-  color: "white",
   cursor: "pointer",
+  color:"#9fadbc",
   ":hover": {
-    color: "656166",
+    color: "#656166",
   },
   width: "20px",
   height: "30px",
@@ -75,13 +83,25 @@ export const boardButtonStyle = style({
 });
 
 export const buttonRow = style({
-  display: "flex",
+  display: "inline",
   alignItems: "center",
+  width:"50px",
   justifyContent: "space-between",
 });
 
 export const listHeader = style({
-  color: "#9fadbc",
-  fontSize: "20px",
   margin: "0",
+  display:"flex",
+  height:"50px",
+  alignItems:"center",
+  justifyContent:"space-between"
+});
+
+export const listTitle = style({
+  display: "inline",
+  textAlign: "left",
+  color: "#9fadbc",
+  fontSize: "14px",
+  fontWeight:"600",
+  width: "60%",
 });

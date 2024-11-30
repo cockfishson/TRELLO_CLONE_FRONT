@@ -7,6 +7,7 @@ import Modal from "../modalWindow/modalWindow";
 import * as styles from "./list.css";
 import { AppDispatch } from "../../redux/store";
 import { useDrop } from "react-dnd";
+import { logActivity } from "../../helpers/create_activity_log";
 
 interface CardType {
   card_id: number;
@@ -36,52 +37,74 @@ const List: React.FC<ListProps> = ({ list, fetchLists, moveCard }) => {
   const dispatch = useDispatch<AppDispatch>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState<React.ReactNode>(null);
+
   const openModal = (content: React.ReactNode) => {
     setModalContent(content);
     setIsModalOpen(true);
   };
-  
+
   const handleAddCard = async (title: string) => {
     if (!title.trim()) return;
 
-    await dispatch(
-      createCard({
-        listId: list.list_id,
-        data: { title, description: "", position: list.TrelloCards.length },
-      }),
-    );
-    await fetchLists();
-    setIsModalOpen(false);
+    try {
+      await dispatch(
+        createCard({
+          listId: list.list_id,
+          data: { title, description: "", position: list.TrelloCards.length },
+        }),
+      );
+      logActivity(
+        dispatch,
+        "create",
+        `Created card "${title}" in list "${list.title}".`,
+      );
+      fetchLists();
+    } finally {
+      setIsModalOpen(false);
+    }
   };
 
-  const [, dropRef] = useDrop(() => ({
+  const [, dropRef] = useDrop({
     accept: "CARD",
-    drop: (draggedItem: any) => {
-      if (draggedItem.listId !== list.list_id) {
-        moveCard(draggedItem.index, 0, draggedItem.listId, list.list_id); 
-      }
+    drop: (item: any) => {
+      moveCard(item.index, list.TrelloCards.length, item.listId, list.list_id);
     },
-  }));
-  
+  });
 
-  const handleEditList = (newTitle: string) => {
+  const handleEditList = async (newTitle: string) => {
     if (!newTitle.trim()) return;
 
-    dispatch(updateList({ listId: list.list_id, data: { title: newTitle } }))
-      .then(() => fetchLists())
-      .finally(() => setIsModalOpen(false));
+    const oldTitle = list.title;
+    try {
+      await dispatch(
+        updateList({ listId: list.list_id, data: { title: newTitle } }),
+      );
+      logActivity(
+        dispatch,
+        "update",
+        `Changed list title from "${oldTitle}" to "${newTitle}".`,
+      );
+      fetchLists();
+    } finally {
+      setIsModalOpen(false);
+    }
   };
 
-  const handleDeleteList = () => {
-    dispatch(deleteList(list.list_id))
-      .then(() => fetchLists())
-      .finally(() => setIsModalOpen(false));
+  const handleDeleteList = async () => {
+    const listTitle = list.title;
+    try {
+      await dispatch(deleteList(list.list_id));
+      logActivity(dispatch, "delete", `Deleted list "${listTitle}".`);
+      fetchLists();
+    } finally {
+      setIsModalOpen(false);
+    }
   };
 
   return (
     <div ref={dropRef} className={styles.list}>
       <div className={styles.listHeader}>
-        <h3>{list.title}</h3>
+        <h4 className={styles.listTitle}>{list.title}</h4>
         <div className={styles.buttonRow}>
           <button
             className={styles.boardButtonStyle}
@@ -127,14 +150,14 @@ const List: React.FC<ListProps> = ({ list, fetchLists, moveCard }) => {
           </button>
         </div>
       </div>
-      <div className={styles.cards}>
-        {[...list.TrelloCards]
+      <div className={styles.cardContainer}>
+        {[...(list.TrelloCards ?? [])]
           .sort((a, b) => a.position - b.position)
-          .map((card, index) => (
+          .map((card, idx) => (
             <Card
               key={card.card_id}
               card={card}
-              index={index}
+              index={idx}
               moveCard={moveCard}
             />
           ))}
