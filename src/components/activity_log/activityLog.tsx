@@ -1,8 +1,9 @@
 import React from "react";
 import * as styles from "./activityLog.css";
+import { ActivityLog } from "../../services/api.ts";
 
-const ActivityLog: React.FC<{
-  logs: any[];
+const ActivityLogs: React.FC<{
+  logs: ActivityLog[];
   isVisible: boolean;
   isLoading: boolean;
 }> = ({ logs, isVisible, isLoading }) => {
@@ -37,4 +38,4 @@ const ActivityLog: React.FC<{
   );
 };
 
-export default ActivityLog;
+export default ActivityLogs;

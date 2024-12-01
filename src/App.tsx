@@ -7,16 +7,18 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import Sidebar from "./components/sidebar/sidebar";
 import Board from "./components/board/board";
 import { fetchActivityLog } from "./redux/slices/activityLogSlice";
-import ActivityLog from "./components/activity_log/activityLog";
+import ActivityLogs from "./components/activity_log/activityLog";
 import Header from "./components/header/header";
 import "./App.css";
 
 const App: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { logs, loading } = useSelector((state: RootState) => state.activityLog);
+  const { logs, loading } = useSelector(
+    (state: RootState) => state.activityLog,
+  );
 
   const activeBoardId = useSelector(
-    (state: RootState) => state.boards.activeBoardId
+    (state: RootState) => state.boards.activeBoardId,
   );
 
   const [isLogVisible, setLogVisibility] = useState(false);
@@ -47,7 +49,11 @@ const App: React.FC = () => {
             <div>Please select a board.</div>
           )}
         </div>
-        <ActivityLog logs={logs} isLoading={loading} isVisible={isLogVisible} />
+        <ActivityLogs
+          logs={logs}
+          isLoading={loading}
+          isVisible={isLogVisible}
+        />
       </div>
     </div>
   );
