@@ -22,7 +22,6 @@ const Board: React.FC<BoardProps> = ({ boardId }) => {
   const sortedLists = [...lists].sort(
     (a: any, b: any) => a.position - b.position,
   );
-  console.log("oops");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState<string>("");
   const fetchListsHandler = useCallback(async (): Promise<void> => {
@@ -53,11 +52,6 @@ const Board: React.FC<BoardProps> = ({ boardId }) => {
       ...list,
       TrelloCards: [...list.TrelloCards],
     }));
-    console.log("it's happening");
-    console.log(dragIndex);
-    console.log(hoverIndex);
-    console.log(dragListId);
-    console.log(hoverListId);
     const sourceList = currentLists.find((list) => list.list_id === dragListId);
     const targetList = currentLists.find(
       (list) => list.list_id === hoverListId,
